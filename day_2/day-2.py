@@ -15,4 +15,3 @@ for c in content:
     total += 2 * (dimention[0] + dimention[1]) + presence(dimention)
 
 print(total)
-# 1598415
