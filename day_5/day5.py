@@ -48,4 +48,4 @@ for elem in content:
     if p1(elem) and p2(elem):
         total += 1
 
-print total
+print(total)

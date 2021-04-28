@@ -38,4 +38,4 @@ for key in houses.keys():
     if houses[key] >= 1:
         total += 1
 
-print total
+print(total)

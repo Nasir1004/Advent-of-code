@@ -13,3 +13,5 @@ jchzalrnumimnmhp is naughty because it has no double letter.
 haegwjzuvuyypxyu is naughty because it contains the string xy.
 dvszwmarrgswjxmb is naughty because it contains only one vowel.
 How many strings are nice?
+
+Answer = 69
