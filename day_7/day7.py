@@ -1,111 +1,73 @@
-# AoC: Day 7
-
-signals = dict()
+from __future__ import print_function
 
 
-with open("input") as f:
-    instructions = f.readlines()
+class Wire(object):
+
+    def __init__(self, line):
+        self._line = line
+        self.parse_line(line)
+
+    def parse_line(self, line):
+        lline = line.split()
+        self.output = lline[-1]
+
+        left = lline[:-2]
+        self.op = 'ASSIGN'
+        for op in ['NOT', 'AND', 'OR', 'LSHIFT', 'RSHIFT']:
+            if op in left:
+                self.op = op
+                left.remove(op)
+        self.inputs = [int(i) if i.isdigit() else i for i in left]
+
+    def reset(self):
+        self.parse_line(self._line)
+
+    def evaluate(self):
+        if self.op == 'ASSIGN':
+            return int(self.inputs[0])
+        elif self.op == 'NOT':
+            return int(65535 - self.inputs[0])
+        elif self.op == 'AND':
+            return int(self.inputs[0] & self.inputs[1])
+        elif self.op == 'OR':
+            return int(self.inputs[0] | self.inputs[1])
+        elif self.op == 'LSHIFT':
+            return int(self.inputs[0] << self.inputs[1])
+        elif self.op == 'RSHIFT':
+            return int(self.inputs[0] >> self.inputs[1])
+        else:
+            raise ValueError('invalid operator')
+
+    def fill_inputs(self, signals):
+        self.inputs = [signals[i] if i in signals else i for i in self.inputs]
+
+    def iscomplete(self):
+        return all([isinstance(i, int) for i in self.inputs])
 
 
-for i in instructions:
-
-    tmp = i.split("->")
-
-    val = tmp[0]
-    val = val.split()
-    var = tmp[1].strip()
-
-    # signal
-    if len(val) == 1 and val[0].isdigit():
-        val          = int(val[0])
-        signals[var] = val
-
-    elif len(val) == 1 and not val[0].isdigit():
-        signals[var] = ("SUBST", val[0])
-
-    elif "AND" in val or "OR" in val or "LSHIFT" in val or "RSHIFT" in val:
-        (a, op, b)   = val[0], val[1], val[2]
-        signals[var] = (op, a, b)
-
-    # NOT
-    elif "NOT" in val:
-        (op, a) = val[0], val[1]
-        signals[var] = (op, a)
+with open('input') as f:
+    wires = [Wire(line) for line in f]
+wires_copy = list(wires)
 
 
-signals['b'] = 956
+def evaluate_circuit(wires, signals):
+    local_wires = list(wires)
+    while len(local_wires) != 0:
+        new_wires = []
+        for wire in wires:
+            if wire.iscomplete():
+                signals[wire.output] = wire.evaluate()
+            else:
+                wire.fill_inputs(signals)
+                new_wires.append(wire)
+        local_wires = new_wires
+    return signals
 
 
-# substitute
-while True:
+signals = evaluate_circuit(wires, {})
+print('a', signals['a'])
 
-    for key in signals.keys():
-
-        val = signals[key]
-
-        if str(val).isdigit():
-            continue
-
-        op = val[0]
-
-        if op == "NOT":
-            (_, var) = val
-            tmp      = signals[var]
-
-            if str(tmp).isdigit():
-                signals[key] = ~tmp & 65535
-
-        elif op == "AND":
-            (_, a, b) = val
-
-            if not str(a).isdigit():
-                a = signals[a]
-
-            if not str(b).isdigit():
-                b = signals[b]
-
-            if str(a).isdigit() and str(b).isdigit():
-                signals[key] = int(a) & b
-
-        elif op == "OR":
-            (_, a, b) = val
-            a = signals[a]
-            b = signals[b]
-
-            if str(a).isdigit() and str(b).isdigit():
-                signals[key] = a | b
-
-        elif op == "LSHIFT":
-            (_, a, n) = val
-            a = signals[a]
-
-            if str(a).isdigit():
-                signals[key] = a << int(n)
-
-        elif op == "RSHIFT":
-            (_, a, n) = val
-            a = signals[a]
-
-            if str(a).isdigit():
-                signals[key] = a >> int(n)
-
-        elif op == "SUBST":
-            (_, a) = val
-
-            a = signals[a]
-
-            if str(a).isdigit():
-                signals[key] = a
-
-    done = True
-    for key in signals.keys():
-         tmp = signals[key]
-
-         if not str(tmp).isdigit():
-             done = False
-             break
-
-    if done:
-        print(signals)
-        print(signals['a'])
-        break
+[wire.reset() for wire in wires]
+wires = [wire for wire in wires if wire.output != 'b']
+signals = evaluate_circuit(wires, {'b': signals['a']})
+print('a', signals['a'])
