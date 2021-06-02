@@ -81,7 +81,7 @@ while True:
     # interestingly, just using the first result is enough:
     candidates = newCandidates[:1]
 
-    print i
+    print(i)
 
 
-print "Number of steps: ", i
+print("Number of steps: ", i)

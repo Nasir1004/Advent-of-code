@@ -48,7 +48,7 @@ def neighborsOn(mat, pos):
 
     allPos      = [p1, p2, p3, p4, p5, p6, p7, p8]
     relevantPos = filter(lambda x: validPos(mat, x), allPos)
-    isOn        = map(lambda (x, y): mat[x][y], relevantPos )
+    isOn        = list(map(lambda (x, y): mat[x][y], relevantPos ))
 
     return sum(isOn)
 
@@ -97,12 +97,12 @@ def updateMatrix(mat):
 
 def printMat(mat):
     for row in mat:
-        print row
+        print(row)
 
 
 for i in range(100):
-    print i
+    print(i)
     m = updateMatrix(m)
 
 
-print sum( map(lambda x: sum(x), m) )
+print (sum( map(lambda x: sum(x), m) ))

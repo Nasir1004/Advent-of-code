@@ -27,5 +27,5 @@ while True:
 
 for idx in range(len(arr)):
     if arr[idx] >= target:
-        print idx
+        print (idx)
         break
